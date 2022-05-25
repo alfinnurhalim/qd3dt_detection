@@ -30,7 +30,7 @@ class Dataset(data.Dataset):
         # use a relative path instead?
 
         # TODO: which camera cal to use, per frame or global one?
-        self.proj_matrix = get_P(os.path.abspath(os.path.dirname(os.path.dirname(__file__)) + '/camera_cal/calib_cam_to_cam.txt'))
+        self.proj_matrix = read_calib(os.path.join(self.top_calib_path,os.listdir(self.top_calib_path)[0]))
 
         self.ids = [x.split('.')[0] for x in sorted(os.listdir(self.top_img_path))] # name of file
         self.num_images = len(self.ids)
@@ -82,7 +82,7 @@ class Dataset(data.Dataset):
 
         if id != self.curr_id:
             self.curr_id = id
-            self.curr_img = cv2.imread(self.top_img_path + '%s.png'%id)
+            self.curr_img = cv2.imread(self.top_img_path + '%s.jpg'%id)
 
         label = self.labels[id][str(line_num)]
         # P doesn't matter here
@@ -150,7 +150,8 @@ class Dataset(data.Dataset):
 
         Dimension = np.array([line[8], line[9], line[10]], dtype=np.double) # height, width, length
         # modify for the average
-        Dimension -= self.averages.get_item(Class)
+        Dimension -= np.array([0.24380,0.57762,0.47710])
+        # Dimension -= self.averages.get_item(Class)
 
         Location = [line[11], line[12], line[13]] # x, y, z
         Location[1] -= Dimension[0] / 2 # bring the KITTI center up to the middle of the object

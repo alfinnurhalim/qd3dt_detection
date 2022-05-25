@@ -162,7 +162,9 @@ def main():
             conf = conf.cpu().data.numpy()[0, :]
             dim = dim.cpu().data.numpy()[0, :]
 
-            dim += averages.get_item(detected_class)
+            print(dim)
+            # dim += averages.get_item(detected_class)
+            dim += np.array([0.24380,0.57762,0.47710])
 
             argmax = np.argmax(conf)
             orient = orient[argmax, :]
@@ -182,6 +184,7 @@ def main():
 
         if FLAGS.show_yolo:
             numpy_vertical = np.concatenate((truth_img, img), axis=0)
+            cv2.imwrite(os.path.join('result',str(img_id)+'.jpg'),numpy_vertical)
             cv2.imshow('SPACE for next image, any other key to exit', numpy_vertical)
         else:
             cv2.imshow('3D detections', img)
