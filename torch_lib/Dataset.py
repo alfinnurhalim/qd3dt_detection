@@ -143,7 +143,12 @@ class Dataset(data.Dataset):
             line[i] = float(line[i])
 
         Alpha = line[3] # what we will be regressing
-        Ry = line[14]
+        # Ry = line[14]
+
+        rotx = line[14]
+        roty = line[15]
+        rotz = line[16]
+
         top_left = (int(round(line[4])), int(round(line[5])))
         bottom_right = (int(round(line[6])), int(round(line[7])))
         Box_2D = [top_left, bottom_right]
@@ -157,7 +162,14 @@ class Dataset(data.Dataset):
         Location[1] -= Dimension[0] / 2 # bring the KITTI center up to the middle of the object
 
         Orientation = np.zeros((self.bins, 2))
+        OrientationX = np.zeros((self.bins, 2))
+        OrientationY = np.zeros((self.bins, 2))
+        OrientationZ = np.zeros((self.bins, 2))
+
         Confidence = np.zeros(self.bins)
+        ConfidenceX = np.zeros(self.bins)
+        ConfidenceY = np.zeros(self.bins)
+        ConfidenceZ = np.zeros(self.bins)
 
         # alpha is [-pi..pi], shift it to be [0..2pi]
         angle = Alpha + np.pi
@@ -170,13 +182,43 @@ class Dataset(data.Dataset):
             Orientation[bin_idx,:] = np.array([np.cos(angle_diff), np.sin(angle_diff)])
             Confidence[bin_idx] = 1
 
+        # =================== rx 
+        bin_idxs_rx = self.get_bin(rotx)
+        bin_idxs_ry = self.get_bin(roty)
+        bin_idxs_rz = self.get_bin(rotz)
+
+        for bin_idx in bin_idxs_rx:
+            angle_diff = rotx - self.angle_bins[bin_idx]
+
+            OrientationX[bin_idx,:] = np.array([np.cos(angle_diff), np.sin(angle_diff)])
+            ConfidenceX[bin_idx] = 1
+
+        for bin_idx in bin_idxs_ry:
+            angle_diff = roty - self.angle_bins[bin_idx]
+
+            OrientationY[bin_idx,:] = np.array([np.cos(angle_diff), np.sin(angle_diff)])
+            ConfidenceY[bin_idx] = 1
+
+        for bin_idx in bin_idxs_rz:
+            angle_diff = rotz - self.angle_bins[bin_idx]
+
+            OrientationZ[bin_idx,:] = np.array([np.cos(angle_diff), np.sin(angle_diff)])
+            ConfidenceZ[bin_idx] = 1
+
         label = {
                 'Class': Class,
                 'Box_2D': Box_2D,
                 'Dimensions': Dimension,
                 'Alpha': Alpha,
                 'Orientation': Orientation,
-                'Confidence': Confidence
+                'Confidence': Confidence,
+                'OrientationX': OrientationX,
+                'ConfidenceX' : ConfidenceX,
+                'OrientationY': OrientationY,
+                'ConfidenceY' : ConfidenceY,
+                'OrientationZ' : OrientationZ,
+                'ConfidenceZ' : ConfidenceY,
+                'rot' : [rotx,roty,rotz]
                 }
 
         return label

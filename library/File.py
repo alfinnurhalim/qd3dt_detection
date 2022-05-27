@@ -15,6 +15,13 @@ def get_calibration_cam_to_image(cab_f):
 
     file_not_found(cab_f)
 
+def read_calib(path):
+    with open(path, 'r') as f:
+        lines = f.readlines()
+        P2 = np.array(lines[2].strip().split(' ')[1:], dtype=np.float32).reshape(3, 4)
+        
+    return P2
+    
 def get_P(cab_f):
     for line in open(cab_f):
         if 'P_rect_02' in line:

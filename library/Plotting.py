@@ -82,7 +82,7 @@ def plot_3d_box(img, cam_to_img, ry, dimension, center):
 
     # plot_3d_pts(img, [center], center, calib_file=calib_file, cam_to_img=cam_to_img)
 
-    R = rotation_matrix(ry)
+    R = rotation_matrix(ry,pitch=ry,roll=ry)
 
     corners = create_corners(dimension, location=center, R=R)
 
